@@ -1,18 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
-/// <summary>
-///  Top-level statements 
-///  Код програми (оператори)  вищого рівня
-/// </summary>
-///
+﻿
 Console.WriteLine("Lab4 C# ");
 AnyFunc();
+Console.WriteLine("First Commit");
 
-/// <summary>
-/// 
-///  Top-level statements must precede namespace and type declarations.
-/// At the top-level methods/functions can be defined and used
-/// На верхньому рівні можна визначати та використовувати методи/функції
-/// </summary>
 void AnyFunc()
 {
     Console.WriteLine(" Some function in top-level");
@@ -25,9 +15,6 @@ cl.Name = " UserClass top-level ";
 Lab4CSharp.UserClass cl2 = new Lab4CSharp.UserClass();
 cl2.Name = " UserClass namespace Lab4CSharp ";
 Console.WriteLine(cl + "   " + cl2 + "   ");
-
-
-
 /// <summary>
 /// 
 /// Top-level statements must precede namespace and type declarations.
