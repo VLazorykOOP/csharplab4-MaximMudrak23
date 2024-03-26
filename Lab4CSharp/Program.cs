@@ -537,35 +537,33 @@ class VectorUInt
 }
 // Task2
 // Task3
-class MatrixUint
+public class MatrixUint
 {
-    protected uint[,] IntArray;
-    protected int n, m;
-    protected int codeError;
-    static int num_m;
+    protected uint[,] IntArray; // масив
+    protected int n, m; // розміри матриці
+    protected int codeError; // код помилки
+    protected static int num_m; // кількість матриць
 
-    // Конструктори
     public MatrixUint()
     {
-        n = m = 1;
+        n = 1;
+        m = 1;
         IntArray = new uint[n, m];
-        codeError = 0;
         num_m++;
     }
 
-    public MatrixUint(int n, int m)
+    public MatrixUint(int rows, int columns)
     {
-        this.n = n;
-        this.m = m;
+        n = rows;
+        m = columns;
         IntArray = new uint[n, m];
-        codeError = 0;
         num_m++;
     }
 
-    public MatrixUint(int n, int m, uint initialValue)
+    public MatrixUint(int rows, int columns, uint initialValue)
     {
-        this.n = n;
-        this.m = m;
+        n = rows;
+        m = columns;
         IntArray = new uint[n, m];
         for (int i = 0; i < n; i++)
         {
@@ -574,42 +572,40 @@ class MatrixUint
                 IntArray[i, j] = initialValue;
             }
         }
-        codeError = 0;
         num_m++;
     }
 
-    // Деструктор
     ~MatrixUint()
     {
-        Console.WriteLine("Matrix deleted.");
+        Console.WriteLine("Destructor called");
     }
 
-    // Методи
-    public void InputElements()
+    public void Input()
     {
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < m; j++)
             {
-                Console.Write($"Enter element [{i},{j}]: ");
-                IntArray[i, j] = uint.Parse(Console.ReadLine());
+                Console.Write($"Enter element at position ({i},{j}): ");
+                IntArray[i, j] = Convert.ToUInt32(Console.ReadLine());
             }
         }
     }
 
-    public void DisplayElements()
+    public void Display()
     {
+        Console.WriteLine("Matrix elements:");
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < m; j++)
             {
-                Console.Write(IntArray[i, j] + "\t");
+                Console.Write($"{IntArray[i, j]} ");
             }
             Console.WriteLine();
         }
     }
 
-    public void AssignValue(uint value)
+    public void SetValue(uint value)
     {
         for (int i = 0; i < n; i++)
         {
@@ -625,16 +621,22 @@ class MatrixUint
         return num_m;
     }
 
-    // Властивості
-    public int N { get { return n; } }
-    public int M { get { return m; } }
+    public int Rows
+    {
+        get { return n; }
+    }
+
+    public int Columns
+    {
+        get { return m; }
+    }
+
     public int CodeError
     {
         get { return codeError; }
         set { codeError = value; }
     }
 
-    // Індексатори
     public uint this[int i, int j]
     {
         get
@@ -660,19 +662,43 @@ class MatrixUint
     {
         get
         {
-            int i = k / m;
-            int j = k % m;
-            if (i >= 0 && i < n && j >= 0 && j < m)
-                return IntArray[i, j];
+            if (k >= 0 && k < n * m)
+                return IntArray[k / m, k % m];
             else
             {
                 codeError = -1;
                 return 0;
             }
         }
+        set
+        {
+            if (k >= 0 && k < n * m)
+                IntArray[k / m, k % m] = value;
+            else
+                codeError = -1;
+        }
     }
 
-    // Перевантаження операторів
+    public static bool operator true(MatrixUint matrix)
+    {
+        foreach (uint element in matrix.IntArray)
+        {
+            if (element == 0)
+                return false;
+        }
+        return true;
+    }
+
+    public static bool operator false(MatrixUint matrix)
+    {
+        return matrix.n == 0 || matrix.m == 0 || !matrix;
+    }
+
+    public static bool operator !(MatrixUint matrix)
+    {
+        return matrix.n != 0 || matrix.m != 0;
+    }
+
     public static MatrixUint operator ++(MatrixUint matrix)
     {
         for (int i = 0; i < matrix.n; i++)
@@ -697,27 +723,233 @@ class MatrixUint
         return matrix;
     }
 
-    public static bool operator true(MatrixUint matrix)
+    public static MatrixUint operator +(MatrixUint matrix1, MatrixUint matrix2)
     {
-        if (matrix.n != 0 && matrix.m != 0)
+        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m)
+            throw new ArgumentException("Matrices must have the same dimensions.");
+
+        MatrixUint result = new MatrixUint(matrix1.n, matrix1.m);
+        for (int i = 0; i < matrix1.n; i++)
         {
-            foreach (uint element in matrix.IntArray)
+            for (int j = 0; j < matrix1.m; j++)
             {
-                if (element != 0)
-                    return true;
+                result[i, j] = matrix1[i, j] + matrix2[i, j];
             }
         }
-        return false;
+        return result;
     }
 
-    public static bool operator false(MatrixUint matrix)
+    public static MatrixUint operator -(MatrixUint matrix1, MatrixUint matrix2)
     {
-        return !(matrix);
+        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m)
+            throw new ArgumentException("Matrices must have the same dimensions.");
+
+        MatrixUint result = new MatrixUint(matrix1.n, matrix1.m);
+        for (int i = 0; i < matrix1.n; i++)
+        {
+            for (int j = 0; j < matrix1.m; j++)
+            {
+                result[i, j] = matrix1[i, j] - matrix2[i, j];
+            }
+        }
+        return result;
     }
 
-    public static bool operator !(MatrixUint matrix)
+    public static MatrixUint operator *(MatrixUint matrix1, MatrixUint matrix2)
     {
-        return matrix.n == 0 || matrix.m == 0;
+        if (matrix1.m != matrix2.n)
+            throw new ArgumentException("Number of columns in the first matrix must equal the number of rows in the second matrix.");
+
+        MatrixUint result = new MatrixUint(matrix1.n, matrix2.m);
+        for (int i = 0; i < matrix1.n; i++)
+        {
+            for (int j = 0; j < matrix2.m; j++)
+            {
+                uint sum = 0;
+                for (int k = 0; k < matrix1.m; k++)
+                {
+                    sum += matrix1[i, k] * matrix2[k, j];
+                }
+                result[i, j] = sum;
+            }
+        }
+        return result;
+    }
+
+    public static MatrixUint operator *(MatrixUint matrix, uint scalar)
+    {
+        MatrixUint result = new MatrixUint(matrix.n, matrix.m);
+        for (int i = 0; i < matrix.n; i++)
+        {
+            for (int j = 0; j < matrix.m; j++)
+            {
+                result[i, j] = matrix[i, j] * scalar;
+            }
+        }
+        return result;
+    }
+
+    public static MatrixUint operator /(MatrixUint matrix, uint scalar)
+    {
+        MatrixUint result = new MatrixUint(matrix.n, matrix.m);
+        for (int i = 0; i < matrix.n; i++)
+        {
+            for (int j = 0; j < matrix.m; j++)
+            {
+                result[i, j] = matrix[i, j] / scalar;
+            }
+        }
+        return result;
+    }
+
+    public static MatrixUint operator %(MatrixUint matrix, uint scalar)
+    {
+        MatrixUint result = new MatrixUint(matrix.n, matrix.m);
+        for (int i = 0; i < matrix.n; i++)
+        {
+            for (int j = 0; j < matrix.m; j++)
+            {
+                result[i, j] = matrix[i, j] % scalar;
+            }
+        }
+        return result;
+    }
+
+    public static MatrixUint operator |(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m)
+            throw new ArgumentException("Matrices must have the same dimensions.");
+
+        MatrixUint result = new MatrixUint(matrix1.n, matrix1.m);
+        for (int i = 0; i < matrix1.n; i++)
+        {
+            for (int j = 0; j < matrix1.m; j++)
+            {
+                result[i, j] = matrix1[i, j] | matrix2[i, j];
+            }
+        }
+        return result;
+    }
+
+    public static MatrixUint operator ^(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m)
+            throw new ArgumentException("Matrices must have the same dimensions.");
+
+        MatrixUint result = new MatrixUint(matrix1.n, matrix1.m);
+        for (int i = 0; i < matrix1.n; i++)
+        {
+            for (int j = 0; j < matrix1.m; j++)
+            {
+                result[i, j] = matrix1[i, j] ^ matrix2[i, j];
+            }
+        }
+        return result;
+    }
+
+    public static MatrixUint operator &(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m)
+            throw new ArgumentException("Matrices must have the same dimensions.");
+
+        MatrixUint result = new MatrixUint(matrix1.n, matrix1.m);
+        for (int i = 0; i < matrix1.n; i++)
+        {
+            for (int j = 0; j < matrix1.m; j++)
+            {
+                result[i, j] = matrix1[i, j] & matrix2[i, j];
+            }
+        }
+        return result;
+    }
+
+    public static MatrixUint operator >>(MatrixUint matrix, int shift)
+    {
+        MatrixUint result = new MatrixUint(matrix.n, matrix.m);
+        for (int i = 0; i < matrix.n; i++)
+        {
+            for (int j = 0; j < matrix.m; j++)
+            {
+                result[i, j] = matrix[i, j] >> shift;
+            }
+        }
+        return result;
+    }
+
+    public static MatrixUint operator <<(MatrixUint matrix, int shift)
+    {
+        MatrixUint result = new MatrixUint(matrix.n, matrix.m);
+        for (int i = 0; i < matrix.n; i++)
+        {
+            for (int j = 0; j < matrix.m; j++)
+            {
+                result[i, j] = matrix[i, j] << shift;
+            }
+        }
+        return result;
+    }
+
+    public static bool operator ==(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m)
+            return false;
+
+        for (int i = 0; i < matrix1.n; i++)
+        {
+            for (int j = 0; j < matrix1.m; j++)
+            {
+                if (matrix1[i, j] != matrix2[i, j])
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    public static bool operator !=(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        return !(matrix1 == matrix2);
+    }
+
+    public static bool operator >(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m)
+            throw new ArgumentException("Matrices must have the same dimensions.");
+
+        for (int i = 0; i < matrix1.n; i++)
+        {
+            for (int j = 0; j < matrix1.m; j++)
+            {
+                if (matrix1[i, j] <= matrix2[i, j])
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    public static bool operator <(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m)
+            throw new ArgumentException("Matrices must have the same dimensions.");
+
+        for (int i = 0; i < matrix1.n; i++)
+        {
+            for (int j = 0; j < matrix1.m; j++)
+            {
+                if (matrix1[i, j] >= matrix2[i, j])
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    public static bool operator >=(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        return matrix1 == matrix2 || matrix1 > matrix2;
+    }
+
+    public static bool operator <=(MatrixUint matrix1, MatrixUint matrix2)
+    {
+        return matrix1 == matrix2 || matrix1 < matrix2;
     }
 }
 // Task3
@@ -874,64 +1106,33 @@ class Program
         // Task2
         // Task3
 
-        // Створення матриці за допомогою різних конструкторів
-        MatrixUint matrix1 = new MatrixUint(); // конструктор без параметрів
-        MatrixUint matrix2 = new MatrixUint(2, 3); // конструктор із двома параметрами
-        MatrixUint matrix3 = new MatrixUint(2, 2, 5); // конструктор із трьома параметрами
+        MatrixUint matrix1 = new MatrixUint(3, 3, 1);
 
-        // Вивід розмірності матриці
-        Console.WriteLine($"Matrix1 size: {matrix1.N}x{matrix1.M}");
-        Console.WriteLine($"Matrix2 size: {matrix2.N}x{matrix2.M}");
-        Console.WriteLine($"Matrix3 size: {matrix3.N}x{matrix3.M}");
+        Console.WriteLine("Matrix 1:");
+        matrix1.Display();
 
-        // Введення елементів матриці з клавіатури
-        Console.WriteLine("Enter elements for matrix1:");
-        matrix1.InputElements();
+        MatrixUint matrix2 = new MatrixUint(3, 3, 2);
 
-        // Вивід елементів матриці на екран
-        Console.WriteLine("Matrix1 elements:");
-        matrix1.DisplayElements();
+        Console.WriteLine("\nMatrix 2:");
+        matrix2.Display();
 
-        // Вивід елементів матриці на екран
-        Console.WriteLine("Matrix2 elements:");
-        matrix2.DisplayElements();
+        MatrixUint sumMatrix = matrix1 + matrix2;
+        Console.WriteLine("\nSum of matrices:");
+        sumMatrix.Display();
 
-        // Вивід елементів матриці на екран
-        Console.WriteLine("Matrix3 elements:");
-        matrix3.DisplayElements();
+        MatrixUint productMatrix = matrix1 * matrix2;
+        Console.WriteLine("\n Multiply of matrices:");
+        productMatrix.Display();
 
-        // Присвоєння всім елементам матриці певного значення
-        uint value = 10;
-        Console.WriteLine($"Assigning value {value} to all elements of matrix2:");
-        matrix2.AssignValue(value);
-
-        // Вивід елементів матриці на екран
-        Console.WriteLine("Matrix2 elements after assigning value:");
-        matrix2.DisplayElements();
-
-        // Підрахунок кількості матриць
-        Console.WriteLine($"Number of matrices: {MatrixUint.CountMatrices()}");
-
-        // Використання індексаторів
-        Console.WriteLine($"Element at index [1, 1] of matrix1: {matrix1[1, 1]}");
-        Console.WriteLine($"Element at index [3] of matrix2: {matrix2[3]}");
-
-        // Перевантаження операторів
-        MatrixUint incrementedMatrix = ++matrix1;
-        Console.WriteLine("Matrix1 after increment:");
-        incrementedMatrix.DisplayElements();
-
-        MatrixUint decrementedMatrix = --matrix2;
-        Console.WriteLine("Matrix2 after decrement:");
-        decrementedMatrix.DisplayElements();
-
-        if (matrix3)
-            Console.WriteLine("Matrix3 is not empty.");
+        if (matrix1 == matrix2)
+        {
+            Console.WriteLine("\nMatrix 1 is equal to Matrix 2");
+        }
         else
-            Console.WriteLine("Matrix3 is empty.");
+        {
+            Console.WriteLine("\nMatrix 1 is not equal to Matrix 2");
+        }
 
-        Console.WriteLine($"Logical negation of matrix3: {!matrix3}");
-
-        // Task3
+    // Task3
     }
 }
