@@ -1,4 +1,5 @@
-﻿enum Color
+﻿// Task1
+enum Color
 {
     Orange,
     Black,
@@ -12,7 +13,7 @@ class Triangle
     protected int x1, y1, x2, y2, x3, y3;
     protected Color color;
 
-    // Оператор индексации
+    // Індексатор
     public object this[int index]
     {
         get
@@ -39,7 +40,7 @@ class Triangle
         }
     }
 
-    // Перегрузка оператора ++
+    // Перевантаження оператора ++
     public static Triangle operator ++(Triangle triangle)
     {
         triangle.x1++;
@@ -48,7 +49,7 @@ class Triangle
         return triangle;
     }
 
-    // Перегрузка оператора --
+    // Перевантаження оператора --
     public static Triangle operator --(Triangle triangle)
     {
         triangle.x1--;
@@ -57,13 +58,7 @@ class Triangle
         return triangle;
     }
 
-    // Явное преобразование Triangle в bool
-    public static explicit operator bool(Triangle triangle)
-    {
-        return triangle.CheckTriangleExistence();
-    }
-
-    // Перегрузка оператора *
+    // Перевантаження оператора *
     public static Triangle operator *(Triangle triangle, int scalar)
     {
         triangle.x1 *= scalar;
@@ -71,8 +66,14 @@ class Triangle
         triangle.x3 *= scalar;
         return triangle;
     }
+    
+    // Явне перетворення Triangle в bool
+    public static explicit operator bool(Triangle triangle)
+    {
+        return triangle.CheckTriangleExistence();
+    }
 
-    // Проверка существования треугольника
+    // Перевірка існування трикутника
     private bool CheckTriangleExistence()
     {
         double AB = CalculateDistance(x1, y1, x2, y2);
@@ -82,13 +83,13 @@ class Triangle
         return AB + BC > CA && AB + CA > BC && BC + CA > AB;
     }
 
-    // Преобразование Triangle в string
+    // Перетворення Triangle в string
     public static implicit operator string(Triangle triangle)
     {
         return $"Triangle: ({triangle.x1},{triangle.y1}), ({triangle.x2},{triangle.y2}), ({triangle.x3},{triangle.y3}), Color: {triangle.color}";
     }
 
-    // Преобразование string в Triangle
+    // Перетворення string в Triangle
     public static implicit operator Triangle(string triangleString)
     {
         string[] parts = triangleString.Split(new char[] { '(', ',', ')', ':', ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -198,9 +199,8 @@ class Triangle
         return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
     }
 }
-
-// That was task1, now task2
-
+// Task1
+// Task2
 class VectorUInt
 {
     protected uint[] IntArray; // масив
@@ -386,28 +386,186 @@ class VectorUInt
         return result;
     }
 
-    // Додаткові перевантаження операторів та інші методи можна додати за аналогією
+    public static VectorUInt operator -(VectorUInt vec1, VectorUInt vec2)
+    {
+        uint maxSize = Math.Max(vec1.size, vec2.size);
+        VectorUInt result = new VectorUInt(maxSize);
+        for (int i = 0; i < maxSize; i++)
+        {
+            uint val1 = (i < vec1.size) ? vec1.IntArray[i] : 0;
+            uint val2 = (i < vec2.size) ? vec2.IntArray[i] : 0;
+            result.IntArray[i] = val1 - val2;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator -(VectorUInt vec, uint scalar)
+    {
+        VectorUInt result = new VectorUInt(vec.size);
+        for (int i = 0; i < vec.size; i++)
+        {
+            result.IntArray[i] = vec.IntArray[i] - scalar;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator *(VectorUInt vec1, VectorUInt vec2)
+    {
+        uint maxSize = Math.Max(vec1.size, vec2.size);
+        VectorUInt result = new VectorUInt(maxSize);
+        for (int i = 0; i < maxSize; i++)
+        {
+            uint val1 = (i < vec1.size) ? vec1.IntArray[i] : 0;
+            uint val2 = (i < vec2.size) ? vec2.IntArray[i] : 0;
+            result.IntArray[i] = val1 * val2;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator *(VectorUInt vec, uint scalar)
+    {
+        VectorUInt result = new VectorUInt(vec.size);
+        for (int i = 0; i < vec.size; i++)
+        {
+            result.IntArray[i] = vec.IntArray[i] * scalar;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator /(VectorUInt vec1, VectorUInt vec2)
+    {
+        uint maxSize = Math.Max(vec1.size, vec2.size);
+        VectorUInt result = new VectorUInt(maxSize);
+        for (int i = 0; i < maxSize; i++)
+        {
+            uint val1 = (i < vec1.size) ? vec1.IntArray[i] : 0;
+            uint val2 = (i < vec2.size) ? vec2.IntArray[i] : 1; // Уникнення ділення на 0
+            result.IntArray[i] = val1 / val2;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator /(VectorUInt vec, uint scalar)
+    {
+        if (scalar == 0)
+        {
+            throw new DivideByZeroException("Division by zero");
+        }
+        VectorUInt result = new VectorUInt(vec.size);
+        for (int i = 0; i < vec.size; i++)
+        {
+            result.IntArray[i] = vec.IntArray[i] / scalar;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator %(VectorUInt vec1, VectorUInt vec2)
+    {
+        uint maxSize = Math.Max(vec1.size, vec2.size);
+        VectorUInt result = new VectorUInt(maxSize);
+        for (int i = 0; i < maxSize; i++)
+        {
+            uint val1 = (i < vec1.size) ? vec1.IntArray[i] : 0;
+            uint val2 = (i < vec2.size) ? vec2.IntArray[i] : 1; // Уникнення ділення на 0
+            result.IntArray[i] = val1 % val2;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator %(VectorUInt vec, uint scalar)
+    {
+        if (scalar == 0)
+        {
+            throw new DivideByZeroException("Division by zero");
+        }
+        VectorUInt result = new VectorUInt(vec.size);
+        for (int i = 0; i < vec.size; i++)
+        {
+            result.IntArray[i] = vec.IntArray[i] % scalar;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator |(VectorUInt vec1, VectorUInt vec2)
+    {
+        uint maxSize = Math.Max(vec1.size, vec2.size);
+        VectorUInt result = new VectorUInt(maxSize);
+        for (int i = 0; i < maxSize; i++)
+        {
+            uint val1 = (i < vec1.size) ? vec1.IntArray[i] : 0;
+            uint val2 = (i < vec2.size) ? vec2.IntArray[i] : 0;
+            result.IntArray[i] = val1 | val2;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator &(VectorUInt vec1, VectorUInt vec2)
+    {
+        uint maxSize = Math.Max(vec1.size, vec2.size);
+        VectorUInt result = new VectorUInt(maxSize);
+        for (int i = 0; i < maxSize; i++)
+        {
+            uint val1 = (i < vec1.size) ? vec1.IntArray[i] : 0;
+            uint val2 = (i < vec2.size) ? vec2.IntArray[i] : 0;
+            result.IntArray[i] = val1 & val2;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator ^(VectorUInt vec1, VectorUInt vec2)
+    {
+        uint maxSize = Math.Max(vec1.size, vec2.size);
+        VectorUInt result = new VectorUInt(maxSize);
+        for (int i = 0; i < maxSize; i++)
+        {
+            uint val1 = (i < vec1.size) ? vec1.IntArray[i] : 0;
+            uint val2 = (i < vec2.size) ? vec2.IntArray[i] : 0;
+            result.IntArray[i] = val1 ^ val2;
+        }
+        return result;
+    }
+
+    public static VectorUInt operator ~(VectorUInt vec)
+    {
+        VectorUInt result = new VectorUInt(vec.size);
+        for (int i = 0; i < vec.size; i++)
+        {
+            result.IntArray[i] = ~vec.IntArray[i];
+        }
+        return result;
+    }
 }
-
-// Class from task3
-
+// Task2
+// Task3
 class MatrixUint
 {
-    private uint[,] IntArray;
-    private int n, m;
-    private int codeError;
-    private static int num_m;
+    protected uint[,] IntArray;
+    protected int n, m;
+    protected int codeError;
+    static int num_m;
 
     // Конструктори
-    public MatrixUint() : this(1, 1) { }
-
-    public MatrixUint(int rows, int cols) : this(rows, cols, 0) { }
-
-    public MatrixUint(int rows, int cols, uint initialValue)
+    public MatrixUint()
     {
-        n = rows;
-        m = cols;
+        n = m = 1;
+        IntArray = new uint[n, m];
         codeError = 0;
+        num_m++;
+    }
+
+    public MatrixUint(int n, int m)
+    {
+        this.n = n;
+        this.m = m;
+        IntArray = new uint[n, m];
+        codeError = 0;
+        num_m++;
+    }
+
+    public MatrixUint(int n, int m, uint initialValue)
+    {
+        this.n = n;
+        this.m = m;
         IntArray = new uint[n, m];
         for (int i = 0; i < n; i++)
         {
@@ -416,36 +574,36 @@ class MatrixUint
                 IntArray[i, j] = initialValue;
             }
         }
+        codeError = 0;
         num_m++;
     }
 
     // Деструктор
     ~MatrixUint()
     {
-        num_m--;
+        Console.WriteLine("Matrix deleted.");
     }
 
     // Методи
     public void InputElements()
     {
-        Console.WriteLine("Enter elements of the matrix:");
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < m; j++)
             {
-                IntArray[i, j] = Convert.ToUInt32(Console.ReadLine());
+                Console.Write($"Enter element [{i},{j}]: ");
+                IntArray[i, j] = uint.Parse(Console.ReadLine());
             }
         }
     }
 
-    public void PrintElements()
+    public void DisplayElements()
     {
-        Console.WriteLine("Matrix elements:");
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < m; j++)
             {
-                Console.Write(IntArray[i, j] + " ");
+                Console.Write(IntArray[i, j] + "\t");
             }
             Console.WriteLine();
         }
@@ -468,10 +626,8 @@ class MatrixUint
     }
 
     // Властивості
-    public int Rows => n;
-
-    public int Cols => m;
-
+    public int N { get { return n; } }
+    public int M { get { return m; } }
     public int CodeError
     {
         get { return codeError; }
@@ -483,19 +639,20 @@ class MatrixUint
     {
         get
         {
-            if (i < 0 || i >= n || j < 0 || j >= m)
+            if (i >= 0 && i < n && j >= 0 && j < m)
+                return IntArray[i, j];
+            else
             {
                 codeError = -1;
-                return IntArray[0, 0];
+                return 0;
             }
-            return IntArray[i, j];
         }
         set
         {
             if (i >= 0 && i < n && j >= 0 && j < m)
-            {
                 IntArray[i, j] = value;
-            }
+            else
+                codeError = -1;
         }
     }
 
@@ -503,18 +660,14 @@ class MatrixUint
     {
         get
         {
-            if (k < 0 || k >= n * m)
+            int i = k / m;
+            int j = k % m;
+            if (i >= 0 && i < n && j >= 0 && j < m)
+                return IntArray[i, j];
+            else
             {
                 codeError = -1;
-                return IntArray[0, 0];
-            }
-            return IntArray[k / m, k % m];
-        }
-        set
-        {
-            if (k >= 0 && k < n * m)
-            {
-                IntArray[k / m, k % m] = value;
+                return 0;
             }
         }
     }
@@ -544,37 +697,37 @@ class MatrixUint
         return matrix;
     }
 
-    public static bool operator !(MatrixUint matrix)
+    public static bool operator true(MatrixUint matrix)
     {
-        return (matrix.n != 0 && matrix.m != 0);
-    }
-
-    public static bool operator ==(MatrixUint matrix1, MatrixUint matrix2)
-    {
-        if (matrix1.n != matrix2.n || matrix1.m != matrix2.m) return false;
-        for (int i = 0; i < matrix1.n; i++)
+        if (matrix.n != 0 && matrix.m != 0)
         {
-            for (int j = 0; j < matrix1.m; j++)
+            foreach (uint element in matrix.IntArray)
             {
-                if (matrix1.IntArray[i, j] != matrix2.IntArray[i, j]) return false;
+                if (element != 0)
+                    return true;
             }
         }
-        return true;
+        return false;
     }
 
-    public static bool operator !=(MatrixUint matrix1, MatrixUint matrix2)
+    public static bool operator false(MatrixUint matrix)
     {
-        return !(matrix1 == matrix2);
+        return !(matrix);
+    }
+
+    public static bool operator !(MatrixUint matrix)
+    {
+        return matrix.n == 0 || matrix.m == 0;
     }
 }
-
-// Down there we have our main function
+// Task3
 
 class Program
 {
     static void Main(string[] args)
     {
         // Task1
+
         //// Створюємо обьєкт трикутника
         //Triangle triangle1 = new Triangle();
 
@@ -628,58 +781,157 @@ class Program
         //// Виводимо строковое уявлення трикутника
         //Console.WriteLine($"Строковое уявлення трикутника: {triangleString}");
 
+        // Task1
         // Task2
 
-        // Створення екземпляра класу VectorUInt за допомогою конструктора без параметрів
-        //VectorUInt vector = new VectorUInt();
-        //VectorUInt vector = new VectorUInt(5, 2);
+        //// Створення об'єкта класу VectorUInt без параметрів
+        //VectorUInt vector1 = new VectorUInt();
 
-        //// Виклик методу для введення елементів вектора з клавіатури
-        //vector.InputVector();
+        //// Введення елементів вектора з клавіатури
+        //vector1.InputVector();
 
-        //// Виклик методу для виведення елементів вектора на екран
-        //vector.DisplayVector();
+        //// Виведення елементів вектора на екран
+        //vector1.DisplayVector();
 
-        //// Виклик методу для присвоєння всім елементам масиву певного значення
-        //vector.SetValues(10);
+        //// Перевірка на істинність (чи всі елементи вектора не рівні 0)
+        //if (vector1)
+        //    Console.WriteLine("Не всі елементи рівні 0");
+        //else
+        //    Console.WriteLine("Всі елементи рівні 0");
 
-        //// Виклик методу для виведення оновлених елементів вектора на екран
-        //vector.DisplayVector();
+        //// Створення об'єкта класу VectorUInt з одним параметром - розміром вектора
+        //VectorUInt vector2 = new VectorUInt(3);
 
-        //// Виклик статичного методу для підрахунку кількості векторів
-        //uint count = VectorUInt.CountVectors();
-        //Console.WriteLine("Number of VectorUInt instances: " + count);
+        //// Виведення елементів вектора на екран
+        //vector2.DisplayVector();
 
-        //// Використання індексатора для звертання до елементів масиву
-        //uint element = vector[0];
-        //Console.WriteLine("Element at index 0: " + element);
+        //// Присвоєння всім елементам масиву певного значення
+        //vector2.SetValues(5);
 
-        //// Зміна значення поля коду помилки через властивість
-        //vector.ErrorCode = -1;
-        //Console.WriteLine("Error code: " + vector.ErrorCode);
+        //// Виведення елементів вектора на екран
+        //vector2.DisplayVector();
 
-        //// Приклади використання перевантажених операторів
-        //VectorUInt vector2 = new VectorUInt(3, 5);
-        //VectorUInt sum = vector + vector2;
+        //// Створення об'єкта класу VectorUInt із двома параметрами - розміром вектора та значенням ініціалізації
+        //VectorUInt vector3 = new VectorUInt(2, 10);
+
+        //// Виведення елементів вектора на екран
+        //vector3.DisplayVector();
+
+        //// Перевірка на істинність (чи всі елементи вектора не рівні 0)
+        //if (vector3)
+        //    Console.WriteLine("Vector contains non-zero elements");
+        //else
+        //    Console.WriteLine("Vector contains only zeros");
+
+        //// Перегляд розмірності вектора
+        //Console.WriteLine("Vector size: " + vector3.Size);
+
+        //// Перегляд коду помилки
+        //Console.WriteLine("Error code: " + vector3.ErrorCode);
+
+        //// Додавання двох векторів
+        //VectorUInt sum = vector1 + vector2;
+
+        //// Виведення елементів вектора на екран
         //sum.DisplayVector();
 
-        //VectorUInt scalarSum = vector + 3;
-        //scalarSum.DisplayVector();
+        //// Додавання скаляра до вектора
+        //VectorUInt sumScalar = vector1 + 5;
 
-        //// Використання унарного оператору ++
-        //vector++;
-        //vector.DisplayVector();
+        //// Виведення елементів вектора на екран
+        //sumScalar.DisplayVector();
 
-        //// Очікуємо введення користувачем для завершення програми
-        //Console.ReadLine();
+        //// Збільшення вектора на одиницю (++vec)
+        //VectorUInt incrementedVector = ++vector1;
+
+        //// Виведення елементів вектора на екран
+        //incrementedVector.DisplayVector();
+
+        //// Зменшення вектора на одиницю (--vec)
+        //VectorUInt decrementedVector = --vector2;
+
+        //// Виведення елементів вектора на екран
+        //decrementedVector.DisplayVector();
+
+        //// Перевірка на істинність (чи всі елементи вектора не рівні 0)
+        //if (decrementedVector)
+        //    Console.WriteLine("Vector contains non-zero elements");
+        //else
+        //    Console.WriteLine("Vector contains only zeros");
+
+        //// Використання бітових операцій
+        //VectorUInt bitwiseOr = vector1 | vector2;
+        //VectorUInt bitwiseAnd = vector1 & vector2;
+        //VectorUInt bitwiseXor = vector1 ^ vector2;
+        //VectorUInt bitwiseNot = ~vector1;
+
+        //// Виведення результатів бітових операцій
+        //bitwiseOr.DisplayVector();
+        //bitwiseAnd.DisplayVector();
+        //bitwiseXor.DisplayVector();
+        //bitwiseNot.DisplayVector();
+
+        // Task2
+        // Task3
+
+        // Створення матриці за допомогою різних конструкторів
+        MatrixUint matrix1 = new MatrixUint(); // конструктор без параметрів
+        MatrixUint matrix2 = new MatrixUint(2, 3); // конструктор із двома параметрами
+        MatrixUint matrix3 = new MatrixUint(2, 2, 5); // конструктор із трьома параметрами
+
+        // Вивід розмірності матриці
+        Console.WriteLine($"Matrix1 size: {matrix1.N}x{matrix1.M}");
+        Console.WriteLine($"Matrix2 size: {matrix2.N}x{matrix2.M}");
+        Console.WriteLine($"Matrix3 size: {matrix3.N}x{matrix3.M}");
+
+        // Введення елементів матриці з клавіатури
+        Console.WriteLine("Enter elements for matrix1:");
+        matrix1.InputElements();
+
+        // Вивід елементів матриці на екран
+        Console.WriteLine("Matrix1 elements:");
+        matrix1.DisplayElements();
+
+        // Вивід елементів матриці на екран
+        Console.WriteLine("Matrix2 elements:");
+        matrix2.DisplayElements();
+
+        // Вивід елементів матриці на екран
+        Console.WriteLine("Matrix3 elements:");
+        matrix3.DisplayElements();
+
+        // Присвоєння всім елементам матриці певного значення
+        uint value = 10;
+        Console.WriteLine($"Assigning value {value} to all elements of matrix2:");
+        matrix2.AssignValue(value);
+
+        // Вивід елементів матриці на екран
+        Console.WriteLine("Matrix2 elements after assigning value:");
+        matrix2.DisplayElements();
+
+        // Підрахунок кількості матриць
+        Console.WriteLine($"Number of matrices: {MatrixUint.CountMatrices()}");
+
+        // Використання індексаторів
+        Console.WriteLine($"Element at index [1, 1] of matrix1: {matrix1[1, 1]}");
+        Console.WriteLine($"Element at index [3] of matrix2: {matrix2[3]}");
+
+        // Перевантаження операторів
+        MatrixUint incrementedMatrix = ++matrix1;
+        Console.WriteLine("Matrix1 after increment:");
+        incrementedMatrix.DisplayElements();
+
+        MatrixUint decrementedMatrix = --matrix2;
+        Console.WriteLine("Matrix2 after decrement:");
+        decrementedMatrix.DisplayElements();
+
+        if (matrix3)
+            Console.WriteLine("Matrix3 is not empty.");
+        else
+            Console.WriteLine("Matrix3 is empty.");
+
+        Console.WriteLine($"Logical negation of matrix3: {!matrix3}");
 
         // Task3
-        //MatrixUint A = new MatrixUint(2, 2, 1);
-        //A.PrintElements();
-        //A[0, 0] = 5;
-        //Console.WriteLine("Element at (0, 0): " + A[0, 0]);
-        //++A;
-        //A.PrintElements();
-        //Console.WriteLine("Number of matrices: " + MatrixUint.CountMatrices());
     }
 }
